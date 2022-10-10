@@ -1,9 +1,39 @@
-﻿// lägger till så man kan använda SoundPlayer som spelar ljudfiler
+﻿// lägger till så man kan använda SoundPlayer
 using System.Media;
+
+class GameData
+{
+    public int oddsOfSuccess, TakenDamage, oddsOfCrit, YourDamage;
+    public bool block = false;
+    public bool Restart = false;
+    public int choice = 0;
+    public int choiceSettings = 3;
+    public bool options = true;
+    public bool optionsSettings = true;
+    public int PlayerHp = 200;
+    public int ChickenHp = 75;
+    public int FoxHp = 100;
+    int GoblinHp = 150;
+    public int CatHp = 50;
+    public int AntHp = 10;
+    public string MusicMute = "off";
+    public bool MusicMuteDoStuff = false;
+    public bool SpecialAttackToggle = false;
+}
+
 internal class Program
 {
-    static void SettingsMenu(ref SoundPlayer settings, ref bool optionsSettings, ref int choiceSettings, ref int PlayerHp, ref int ChickenHp, ref int FoxHp, ref int GoblinHp, ref string MusicMute, ref bool MusicMuteDoStuff, ref int CatHp, ref int AntHp)
+    public static GameData gameData = new GameData();
+
+    public static Enemy fox = new Enemy(75);
+    public static Enemy goblin = new Enemy(150);
+    public static Enemy cat = new Enemy(100);
+    public static Enemy ant = new Enemy(150);
+
+    static void SettingsMenu(GameData data)
     {
+        gameData.HurtGoblin(30);
+
         if (!MusicMuteDoStuff)
         {
             settings.PlayLooping();
@@ -18,7 +48,7 @@ internal class Program
             Console.WriteLine($"   Fox stats");
             Console.WriteLine($"   Goblin stats");
             Console.WriteLine($"   Cat stats");
-            Console.WriteLine($"   God of Ants stats");
+            Console.WriteLine($"   Ant stats");
             Console.WriteLine($"   Turn {MusicMute} music");
             Console.WriteLine("   Exit Settings");
             Console.SetCursorPosition(1, choiceSettings);
@@ -33,7 +63,7 @@ internal class Program
             {
                 // Fixar så att när man trycker på mute knappen så ändras texten till on eller off beroende på om den är på eller av.
                 if (MusicMuteDoStuff) { MusicMute = "off"; } else { MusicMute = "on"; }
-                switch (choiceSettings)
+                switch (gameData.choiceSettings)
                 {
                     // case 3 - 7, Man kan ändra HP för alla karaktärer.
                     case 3:
@@ -44,11 +74,6 @@ internal class Program
                         Console.Write("> ");
                         // Den här under ser till att bara tal får skrivas in, allt annat gör om hp till deras default value.
                         if (int.TryParse(Console.ReadLine(), out PlayerHp)) { }
-                        else
-                        {
-                            PlayerHp = 200;
-                        }
-                        if (PlayerHp < 0){ PlayerHp = 200;}
                         break;
                     case 4:
                         Console.Clear();
@@ -57,11 +82,6 @@ internal class Program
                         Console.WriteLine("Just type the number, don't end it with HP at the end.\n");
                         Console.Write("> ");
                         if (int.TryParse(Console.ReadLine(), out ChickenHp)) { }
-                        else
-                        {
-                            ChickenHp = 75;
-                        }
-                        if (ChickenHp < 0){ ChickenHp = 75;}
                         break;
                     case 5:
                         Console.Clear();
@@ -70,11 +90,6 @@ internal class Program
                         Console.WriteLine("Just type the number, don't end it with HP at the end.\n");
                         Console.Write("> ");
                         if (int.TryParse(Console.ReadLine(), out FoxHp)) { }
-                        else
-                        {
-                            FoxHp = 100;
-                        }
-                        if (FoxHp < 0){ FoxHp = 100;}
                         break;
                     case 6:
                         Console.Clear();
@@ -83,11 +98,6 @@ internal class Program
                         Console.WriteLine("Just type the number, don't end it with HP at the end.\n");
                         Console.Write("> ");
                         if (int.TryParse(Console.ReadLine(), out GoblinHp)) { }
-                        else
-                        {
-                            GoblinHp = 150;
-                        }
-                        if (GoblinHp < 0){ GoblinHp = 150;}
                         break;
                     case 7:
                         Console.Clear();
@@ -96,11 +106,6 @@ internal class Program
                         Console.WriteLine("Just type the number, don't end it with HP at the end.\n");
                         Console.Write("> ");
                         if (int.TryParse(Console.ReadLine(), out CatHp)) { }
-                        else
-                        {
-                            CatHp = 50;
-                        }
-                        if (CatHp < 0){ CatHp = 50;}
                         break;
                     case 8:
                         settings.Stop();
@@ -129,6 +134,9 @@ internal class Program
     }
     private static void Main(string[] args)
     {
+
+        GameData currentGameData = new GameData();
+
         // Ger "rand" variabeln till en random number generator
         Random rand = new Random();
 
@@ -138,25 +146,9 @@ internal class Program
         SoundPlayer encounter = new SoundPlayer(@"encounter.wav");
         SoundPlayer lose = new SoundPlayer(@"gameover.wav");
         SoundPlayer settings = new SoundPlayer(@"settings.wav");
-        SoundPlayer kamehameha = new SoundPlayer(@"lol.wav");
 
         // Massa grejer som definierar variabler.
-        int oddsOfSuccess, TakenDamage, oddsOfCrit, YourDamage;
-        bool block = false;
-        bool Restart = false;
-        int choice = 0;
-        int choiceSettings = 3;
-        bool options = true;
-        bool optionsSettings = true;
-        int PlayerHp = 200;
-        int ChickenHp = 75;
-        int FoxHp = 100;
-        int GoblinHp = 150;
-        int CatHp = 50;
-        int AntHp = 10;
-        string MusicMute = "off";
-        bool MusicMuteDoStuff = false;
-        bool SpecialAttackToggle = false;
+
 
         // Array för alla olika fiendernas namn
         string[] EnemyName = { "Chicken", "Fox", "Goblin", "Cat", "Ant" };
@@ -167,7 +159,7 @@ internal class Program
         // Main menu
         while (true)
         {
-            Console.WriteLine("Turn based fighting game v1.3\nBy Nicolás TE21B");
+            Console.WriteLine("Turn based fighting game v1.2\nBy Nicolás TE21B");
             Console.WriteLine("-----------------------------");
             Console.WriteLine("\nWrite start to start the game\nWrite info to learn more about the game\nWrite settings to modify game");
             Console.Write("\n> ");
@@ -182,9 +174,8 @@ internal class Program
             else if (TitleScreenInput == "settings")
             {
                 Console.Clear();
-                // Alla ref behövdes för funktionen skulle fungera. Jag vet inte exakt varför det här händer, jag hade problem och visste inte alls hur man skulle fixa men sen fixade en 3:a det genom att göra den här långa ref kedja.
-                // UPDATE: Sebastian webbutvecklingslärare såg det här och satt med mig i typ 15 minuter och lärde mig att det skulle vara bättre med att använda Class.
-                SettingsMenu(ref settings, ref optionsSettings, ref choiceSettings, ref PlayerHp, ref ChickenHp, ref FoxHp, ref GoblinHp, ref MusicMute, ref MusicMuteDoStuff, ref CatHp, ref AntHp);
+                // Alla ref behövdes för funktionen skulle fungera. Jag vet inte exakt varför det här händer, jag hade problem och visste inte alls hur man skulle fixa men sen fick en 3:a hjälpa mig. 
+                SettingsMenu(currentGameData);
                 // Stänger av settings musiken
                 settings.Stop();
                 Console.Clear();
@@ -194,7 +185,7 @@ internal class Program
             {
                 Console.Clear();
                 Console.WriteLine("----------------- Information -----------------");
-                Console.WriteLine("> There are 5 enemies you can encounter.\n\n> Each enemy has different amount of HP.\n\n> The chicken is light as a feather which makes\n  him a fast and dangerous enemy!\n  It gives him more crit chance!\n\n> You can modify the game by typing settings.\n  in the title screen.\n\n> When the enemies are charging their\n  special attack, it's best you dodge!\n\n> The cat is too cute, try dodging it.\n\n> If you encounter The God of Ants, run.");
+                Console.WriteLine("> There are 3 enemies you can encounter.\n\n> Each enemy has different amount of HP.\n\n> The chicken is light as a feather which makes\n  him a fast and dangerous enemy!\n  The chicken is more likely to crit.\n\n> You can modify the game by typing settings.\n  in the title screen.\n\n> When the enemies are charging their\n  special attack, it's best you dodge!\n\n> If you encounter the ant, run.\n\n> The cat is too cute, try dodging it.");
                 Console.WriteLine("-----------------------------------------------");
                 Console.WriteLine("\nPress enter to go back");
                 Console.ReadLine();
@@ -218,7 +209,6 @@ internal class Program
                 break;
             }
             // Väljer ut en slumpmässig fiende från RandomEnemy Array
-            // burgare
             int RandomEnemy = rand.Next(5);
             // Gör EnemyMaxHP till den valde fiendes hp.
             int EnemyMaxHP = EnemyHps[RandomEnemy];
@@ -372,35 +362,35 @@ internal class Program
                 if (EnemyName[RandomEnemy] == "Chicken")
                 {
                     Console.SetCursorPosition(59, 4);
-                    Console.WriteLine("Chicken");
+                    Console.WriteLine($"{EnemyName[RandomEnemy]}");
                     Console.SetCursorPosition(58, 6);
                     Console.WriteLine($"HP: {EnemyHps[RandomEnemy]}/75" + " ");
                 }
                 else if (EnemyName[RandomEnemy] == "Fox")
                 {
                     Console.SetCursorPosition(59, 4);
-                    Console.WriteLine("Fox");
+                    Console.WriteLine($"{EnemyName[RandomEnemy]}");
                     Console.SetCursorPosition(55, 6);
                     Console.WriteLine($"HP: {EnemyHps[RandomEnemy]}/100" + " ");
                 }
                 else if (EnemyName[RandomEnemy] == "Goblin")
                 {
                     Console.SetCursorPosition(60, 4);
-                    Console.WriteLine("Goblin");
+                    Console.WriteLine($"{EnemyName[RandomEnemy]}");
                     Console.SetCursorPosition(55, 6);
                     Console.WriteLine($"HP: {EnemyHps[RandomEnemy]}/150" + " ");
                 }
                 else if (EnemyName[RandomEnemy] == "Cat")
                 {
                     Console.SetCursorPosition(61, 4);
-                    Console.WriteLine("Cat");
+                    Console.WriteLine($"{EnemyName[RandomEnemy]}");
                     Console.SetCursorPosition(55, 6);
                     Console.WriteLine($"HP: {EnemyHps[RandomEnemy]}/50" + " ");
                 }
                 else
                 {
-                    Console.SetCursorPosition(57, 4);
-                    Console.WriteLine($"God of Ants");
+                    Console.SetCursorPosition(60, 4);
+                    Console.WriteLine($"{EnemyName[RandomEnemy]}");
                     Console.SetCursorPosition(58, 6);
                     Console.WriteLine($"HP: {EnemyHps[RandomEnemy]}/10" + " ");
                 }
@@ -506,7 +496,7 @@ internal class Program
                         return;
                     }
                     else { }
-                    // Om oddsOfSuccess är 9 eller 10 så kommer fienden chargea upp sin special attack och sätter på SpecialAttackToggle.
+                    // Om oddsOfSuccess är 5 eller 6 så kommer fienden chargea upp sin special attack och sätter på SpecialAttackToggle.
                     // Nästa move är guaranterat att bli fiendens special attack om man inte har blockat.
                     oddsOfSuccess = rand.Next(1, 11);
                     if (oddsOfSuccess > 8)
@@ -573,43 +563,9 @@ internal class Program
                 // Om man blockar fiendens attack och om den fienden är katten så kommer den springa in i din shield och skada sig själv.
                 else if (EnemyName[RandomEnemy] == "Cat")
                 {
-                    Console.WriteLine("The cat ran into your shield and hit their head");
+                    Console.WriteLine("The cat ran into your shield and hit it's head");
                     EnemyHps[RandomEnemy] -= 25;
                     ShowHealthEnemy();
-                }
-                else if (EnemyName[RandomEnemy] == "Ant")
-                {
-                    battle.Stop();
-                    Console.WriteLine("Blocking my attack? It is futile.");
-                    Task.Delay(2000).Wait();
-                    Console.WriteLine("I, the God of ants, am an unstoppable force!");
-                    Task.Delay(3000).Wait();
-                    Console.WriteLine("I shall give you divine punishment!\n");
-                    Task.Delay(3000).Wait();
-                    Console.WriteLine($"The {EnemyName[RandomEnemy]} used their godly powers to obliterate you for \n999999999 damage!");
-                    PlayerHp -= 999999999;
-                    ShowHealthPlayer();
-                    Task.Delay(4000).Wait();
-                    Console.SetCursorPosition(0, 9);
-                    Console.WriteLine("I am not done with you...");
-                    Task.Delay(2500).Wait();
-                    Console.WriteLine("Say goodbye to your game!");
-                    Task.Delay(2500).Wait();
-                    kamehameha.Play();
-                    Task.Delay(1000).Wait();
-                    Console.WriteLine("Kame...");
-                    Task.Delay(1500).Wait();
-                    Console.WriteLine("Hame....");
-                    Task.Delay(1500).Wait();
-                    Console.WriteLine("HA!!!!!!!");
-                    Task.Delay(1000).Wait();
-                    Console.BackgroundColor = ConsoleColor.Blue;
-                    Console.Clear();
-                    Task.Delay(1000).Wait();
-                    Console.BackgroundColor = ConsoleColor.White;
-                    Console.Clear();
-                    Task.Delay(1000).Wait();
-                    Environment.Exit(0);
                 }
                 // Blockera fienden attack och om de hade chargeat sin special attack så skulle den stängas av
                 else
@@ -745,14 +701,12 @@ internal class Program
                 }
                 else
                 {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.Write(@"                 
                                                        '\__
                                                         (o )     ___
                                                         <>(_)(_)(___)
                                                           < < > >
                                                           ' ' ` `");
-                    Console.ResetColor();
                 }
             }
         }
