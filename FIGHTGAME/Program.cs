@@ -2,7 +2,7 @@
 using System.Media;
 internal class Program
 {
-    static void SettingsMenu(ref SoundPlayer settings, ref bool optionsSettings, ref int choiceSettings, ref int PlayerHp, ref int ChickenHp, ref int FoxHp, ref int GoblinHp, ref string MusicMute, ref bool MusicMuteDoStuff, ref int CatHp, ref int AntHp)
+    static void SettingsMenu(ref SoundPlayer settings, ref bool optionsSettings, ref int choiceSettings, ref int PlayerHp, ref int ChickenHp, ref int FoxHp, ref int GoblinHp, ref string MusicMute, ref bool MusicMuteDoStuff, ref int CatHp, ref int AntHp, ref int[] EnemyHps, ref int PlayerMaxHp, ref int PrevMaxHp)
     {
         if (!MusicMuteDoStuff)
         {
@@ -39,68 +39,150 @@ internal class Program
                     case 3:
                         Console.Clear();
                         Console.WriteLine("How much health should you have? (Max 400HP)\n");
-                        Console.WriteLine($"You currently have {PlayerHp} HP");
+                        Console.WriteLine($"You currently have {PlayerMaxHp} HP");
                         Console.WriteLine("Just type the number, don't end it with HP at the end.\n");
                         Console.Write("> ");
-                        // Den här under ser till att bara tal får skrivas in, allt annat gör om hp till deras default value.
-                        if (int.TryParse(Console.ReadLine(), out PlayerHp)) { }
-                        else
+                        // PrevMaxHp finns för om man skriver in ett ogiltigt svar så blir custom hp till det förra talet så det inte görs om till 0 eller något dåligt.
+                        // Sätter PrevMaxHp till vad PlayerMaxHps nuvarande värde är så den kan användas som en template.
+                        PrevMaxHp = PlayerMaxHp;
+                        // Den här under ser till att bara tal får skrivas in, allt annat gör om hp till deras current value.
+                        if (int.TryParse(Console.ReadLine(), out PlayerMaxHp))
                         {
-                            PlayerHp = 200;
+                            // Gör om 0 eller negativa tal till vad det var förut (PrevMaxHp). Gör också om sin custom HP så att den inte blir för hög.
+                            if (PlayerMaxHp < 1 || PlayerMaxHp > 400)
+                            {
+                                Console.Clear();
+                                Console.WriteLine("Invalid answer detected\nRestoring to previous value...");
+                                Task.Delay(2000).Wait();
+                                // Oj! Talet var ogiltigt. Gör om det ogiltigt talet till vad det var förut så det inte blir knas.
+                                PlayerMaxHp = PrevMaxHp;
+                            }
+                            else
+                            {
+                                // Säger att ditt giltiga svar är nu ditt nuvarande HP.
+                                Console.Clear();
+                                Console.WriteLine($"Okay! Your HP is now {PlayerMaxHp}.");
+                                Task.Delay(2000).Wait();
+                            }
                         }
-                        if (PlayerHp < 0){ PlayerHp = 200;}
+                        else 
+                        {
+                            // Lämnar man in ett tomt svar så gör den om sin HP till vad det var förut. Annars händer det att sitt HP blir till 0.
+                            PlayerMaxHp = PrevMaxHp;
+                        }
                         break;
                     case 4:
                         Console.Clear();
-                        Console.WriteLine("How much health should the chicken have?\n");
-                        Console.WriteLine($"The chicken currently have {ChickenHp} HP");
+                        Console.WriteLine("How much health should the chicken have? (Max 400HP)\n");
+                        Console.WriteLine($"The chicken currently has {EnemyHps[0]} HP");
                         Console.WriteLine("Just type the number, don't end it with HP at the end.\n");
                         Console.Write("> ");
-                        if (int.TryParse(Console.ReadLine(), out ChickenHp)) { }
-                        else
+                        // EnemyHps[0] menas att det tar ut hp av vilken fiende som är på den platsen i Arrayn. Chicken är 0 i Arrayen för den är på första plats (0).
+                        PrevMaxHp = EnemyHps[0];
+                        if (int.TryParse(Console.ReadLine(), out EnemyHps[0]))
                         {
-                            ChickenHp = 75;
+                            if (EnemyHps[0] < 1 || EnemyHps[0] > 400)
+                            {
+                                Console.Clear();
+                                Console.WriteLine("Invalid answer detected\nRestoring to previous value...");
+                                Task.Delay(2000).Wait();
+                                EnemyHps[0] = PrevMaxHp;
+                            }
+                            else
+                            {
+                                Console.Clear();
+                                Console.WriteLine($"Okay! The chickens HP is now {EnemyHps[0]}.");
+                                Task.Delay(2000).Wait();
+                            }
                         }
-                        if (ChickenHp < 0){ ChickenHp = 75;}
+                        else 
+                        {
+                            EnemyHps[0] = PrevMaxHp;
+                        }
                         break;
                     case 5:
                         Console.Clear();
-                        Console.WriteLine("How much health should the fox have?\n");
-                        Console.WriteLine($"The fox currently have {FoxHp} HP");
+                        Console.WriteLine("How much health should the fox have? (Max 400HP)\n");
+                        Console.WriteLine($"The fox currently has {EnemyHps[1]} HP");
                         Console.WriteLine("Just type the number, don't end it with HP at the end.\n");
                         Console.Write("> ");
-                        if (int.TryParse(Console.ReadLine(), out FoxHp)) { }
-                        else
+                        PrevMaxHp = EnemyHps[1];
+                        if (int.TryParse(Console.ReadLine(), out EnemyHps[1]))
                         {
-                            FoxHp = 100;
+                            if (EnemyHps[1] < 1 || EnemyHps[1] > 400)
+                            {
+                                Console.Clear();
+                                Console.WriteLine("Invalid answer detected\nRestoring to previous value...");
+                                Task.Delay(2000).Wait();
+                                EnemyHps[1] = PrevMaxHp;
+                            }
+                            else
+                            {
+                                Console.Clear();
+                                Console.WriteLine($"Okay! The foxs HP is now {EnemyHps[1]}.");
+                                Task.Delay(2000).Wait();
+                            }
                         }
-                        if (FoxHp < 0){ FoxHp = 100;}
+                        else 
+                        {
+                            EnemyHps[1] = PrevMaxHp;
+                        }
                         break;
                     case 6:
                         Console.Clear();
-                        Console.WriteLine("How much health should the goblin have?\n");
-                        Console.WriteLine($"The goblin currently have {GoblinHp} HP");
+                        Console.WriteLine("How much health should the goblin have? (Max 400HP)\n");
+                        Console.WriteLine($"The goblin currently has {EnemyHps[2]} HP");
                         Console.WriteLine("Just type the number, don't end it with HP at the end.\n");
                         Console.Write("> ");
-                        if (int.TryParse(Console.ReadLine(), out GoblinHp)) { }
-                        else
+                        PrevMaxHp = EnemyHps[2];
+                        if (int.TryParse(Console.ReadLine(), out EnemyHps[2]))
                         {
-                            GoblinHp = 150;
+                            if (EnemyHps[2] < 1 || EnemyHps[2] > 400)
+                            {
+                                Console.Clear();
+                                Console.WriteLine("Invalid answer detected\nRestoring to previous value...");
+                                Task.Delay(2000).Wait();
+                                EnemyHps[2] = PrevMaxHp;
+                            }
+                            else
+                            {
+                                Console.Clear();
+                                Console.WriteLine($"Okay! The goblins HP is now {EnemyHps[2]}.");
+                                Task.Delay(2000).Wait();
+                            }
                         }
-                        if (GoblinHp < 0){ GoblinHp = 150;}
+                        else 
+                        {
+                            EnemyHps[2] = PrevMaxHp;
+                        }
                         break;
                     case 7:
                         Console.Clear();
-                        Console.WriteLine("How much health should the cat have?\n");
-                        Console.WriteLine($"The cat currently have {CatHp} HP");
+                        Console.WriteLine("How much health should the cat have? (Max 200HP)\n");
+                        Console.WriteLine($"The cat currently has {EnemyHps[3]} HP");
                         Console.WriteLine("Just type the number, don't end it with HP at the end.\n");
                         Console.Write("> ");
-                        if (int.TryParse(Console.ReadLine(), out CatHp)) { }
-                        else
+                        PrevMaxHp = EnemyHps[3];
+                        if (int.TryParse(Console.ReadLine(), out EnemyHps[3]))
                         {
-                            CatHp = 50;
+                            if (EnemyHps[3] < 1 || EnemyHps[3] > 200)
+                            {
+                                Console.Clear();
+                                Console.WriteLine("Invalid answer detected\nRestoring to previous value...");
+                                Task.Delay(2000).Wait();
+                                EnemyHps[3] = PrevMaxHp;
+                            }
+                            else
+                            {
+                                Console.Clear();
+                                Console.WriteLine($"Okay! The cats HP is now {EnemyHps[3]}.");
+                                Task.Delay(2000).Wait();
+                            }
                         }
-                        if (CatHp < 0){ CatHp = 50;}
+                        else 
+                        {
+                            EnemyHps[3] = PrevMaxHp;
+                        }
                         break;
                     case 8:
                         settings.Stop();
@@ -149,6 +231,8 @@ internal class Program
         bool options = true;
         bool optionsSettings = true;
         int PlayerHp = 200;
+        int PlayerMaxHp = 200;
+        int PrevMaxHp = 0;
         int ChickenHp = 75;
         int FoxHp = 100;
         int GoblinHp = 150;
@@ -184,7 +268,7 @@ internal class Program
                 Console.Clear();
                 // Alla ref behövdes för funktionen skulle fungera. Jag vet inte exakt varför det här händer, jag hade problem och visste inte alls hur man skulle fixa men sen fixade en 3:a det genom att göra den här långa ref kedja.
                 // UPDATE: Sebastian webbutvecklingslärare såg det här och satt med mig i typ 15 minuter och lärde mig att det skulle vara bättre med att använda Class.
-                SettingsMenu(ref settings, ref optionsSettings, ref choiceSettings, ref PlayerHp, ref ChickenHp, ref FoxHp, ref GoblinHp, ref MusicMute, ref MusicMuteDoStuff, ref CatHp, ref AntHp);
+                SettingsMenu(ref settings, ref optionsSettings, ref choiceSettings, ref PlayerHp, ref ChickenHp, ref FoxHp, ref GoblinHp, ref MusicMute, ref MusicMuteDoStuff, ref CatHp, ref AntHp, ref EnemyHps, ref PlayerMaxHp, ref PrevMaxHp);
                 // Stänger av settings musiken
                 settings.Stop();
                 Console.Clear();
@@ -218,10 +302,11 @@ internal class Program
                 break;
             }
             // Väljer ut en slumpmässig fiende från RandomEnemy Array
-            // burgare
             int RandomEnemy = rand.Next(5);
+            // int RandomEnemy = 0;
             // Gör EnemyMaxHP till den valde fiendes hp.
             int EnemyMaxHP = EnemyHps[RandomEnemy];
+            PlayerHp = PlayerMaxHp;
 
             // Om man stängde av musiken i settings så spelas inte encounter ljudet
             if (!MusicMuteDoStuff)
@@ -311,12 +396,12 @@ internal class Program
                                 LowAttack();
                                 break;
                             case 1:
-                                // Samma som ovan
+                                // Samma som ovan fast med HighAttack
                                 Console.SetCursorPosition(0, 0);
                                 HighAttack();
                                 break;
                             case 2:
-                                // Du fattar grejen
+                                // Samma som ovan fast med BlockAttack
                                 Console.SetCursorPosition(0, 0);
                                 BlockAttack();
                                 break;
@@ -332,7 +417,9 @@ internal class Program
                 }
             }
 
-            // Skriver ut mitt HP, den skriver ut den röda och sen den gröna. Gröna är på den röda och försvinner beroende på hur mycket HP man har förlorat. När gröna försvinner ser man det röda som är under den gröna.
+            // Skriver ut mitt HP, den skriver ut den röda och sen den gröna.
+            // Gröna är på den röda och försvinner beroende på hur mycket HP man har förlorat.
+            // När gröna försvinner ser man det röda som är under den gröna.
             void ShowHealthPlayer()
             {
                 Console.SetCursorPosition(80, 28);
@@ -349,7 +436,7 @@ internal class Program
                 }
                 Console.SetCursorPosition(80, 27);
                 Console.ResetColor();
-                Console.WriteLine($"HP: {PlayerHp}/200" + " ");
+                Console.WriteLine($"HP: {PlayerHp}/{PlayerMaxHp}" + " ");
             }
 
             // Samma som ovan fast för fiender. HP och namnet beror på vilken fiende det är man möter.
@@ -374,35 +461,35 @@ internal class Program
                     Console.SetCursorPosition(59, 4);
                     Console.WriteLine("Chicken");
                     Console.SetCursorPosition(58, 6);
-                    Console.WriteLine($"HP: {EnemyHps[RandomEnemy]}/75" + " ");
+                    Console.WriteLine($"HP: {EnemyHps[RandomEnemy]}/{EnemyMaxHP}" + " ");
                 }
                 else if (EnemyName[RandomEnemy] == "Fox")
                 {
                     Console.SetCursorPosition(59, 4);
                     Console.WriteLine("Fox");
                     Console.SetCursorPosition(55, 6);
-                    Console.WriteLine($"HP: {EnemyHps[RandomEnemy]}/100" + " ");
+                    Console.WriteLine($"HP: {EnemyHps[RandomEnemy]}/{EnemyMaxHP}" + " ");
                 }
                 else if (EnemyName[RandomEnemy] == "Goblin")
                 {
                     Console.SetCursorPosition(60, 4);
                     Console.WriteLine("Goblin");
                     Console.SetCursorPosition(55, 6);
-                    Console.WriteLine($"HP: {EnemyHps[RandomEnemy]}/150" + " ");
+                    Console.WriteLine($"HP: {EnemyHps[RandomEnemy]}/{EnemyMaxHP}" + " ");
                 }
                 else if (EnemyName[RandomEnemy] == "Cat")
                 {
                     Console.SetCursorPosition(61, 4);
                     Console.WriteLine("Cat");
                     Console.SetCursorPosition(55, 6);
-                    Console.WriteLine($"HP: {EnemyHps[RandomEnemy]}/50" + " ");
+                    Console.WriteLine($"HP: {EnemyHps[RandomEnemy]}/{EnemyMaxHP}" + " ");
                 }
                 else
                 {
                     Console.SetCursorPosition(57, 4);
                     Console.WriteLine($"God of Ants");
                     Console.SetCursorPosition(58, 6);
-                    Console.WriteLine($"HP: {EnemyHps[RandomEnemy]}/10" + " ");
+                    Console.WriteLine($"HP: {EnemyHps[RandomEnemy]}/{EnemyMaxHP}" + " ");
                 }
                 Console.SetCursorPosition(0, 3);
             }
@@ -599,7 +686,7 @@ internal class Program
                     Task.Delay(1000).Wait();
                     Console.WriteLine("Kame...");
                     Task.Delay(1500).Wait();
-                    Console.WriteLine("Hame....");
+                    Console.WriteLine("Hame...");
                     Task.Delay(1500).Wait();
                     Console.WriteLine("HA!!!!!!!");
                     Task.Delay(1000).Wait();
@@ -690,7 +777,7 @@ internal class Program
                     Restart = true;
                     victory.Stop();
                     Console.Clear();
-                    PlayerHp = 200; EnemyHps[RandomEnemy] = EnemyMaxHP;
+                    EnemyHps[RandomEnemy] = EnemyMaxHP;
                     SpecialAttackToggle = false;
                 }
             }
