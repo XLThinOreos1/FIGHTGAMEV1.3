@@ -772,7 +772,7 @@ internal class Program
                     Environment.Exit(0);
                 }
                 else
-                // Om man vill köra igen så resettas HP till default value.
+                // Om man vill köra igen så resettas fiendens HP till deras default value.
                 {
                     Restart = true;
                     victory.Stop();
@@ -785,6 +785,7 @@ internal class Program
             // Här har vi alla fina ASCII-arts av fienderna
             void EnemyArt()
             {
+                // Sätter ASCII-arten på mitten av skärmen.
                 Console.SetCursorPosition(80, 9);
                 if (EnemyName[RandomEnemy] == "Chicken")
                 {
